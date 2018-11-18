@@ -1,2 +1,2 @@
 # blog
-A small blog made in flask
+A small blog website made in flask

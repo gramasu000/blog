@@ -19,5 +19,5 @@ export FLASK_APP=flaskr
 export FLASK_ENV=development
 
 # We run the flask app
-flask init-db
+flask run
 

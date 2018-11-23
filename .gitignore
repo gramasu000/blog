@@ -3,3 +3,5 @@ __pycache__
 blog-env
 instance
 *.pyc
+build
+flaskr.egg-info

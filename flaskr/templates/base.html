@@ -1,9 +1,19 @@
-<!doctype html>
+{# 
+    We start with a base template with title, header and content blocks
+    that each individual view can fill up with its own content.
+    The object g is automatically available in templates.
+#}
+
+<!DOCTYPE HTML>
+{# Title block for individual view #}
 <title>{% block title %}{% endblock %} - Flaskr</title>
+{# Link to CSS file in static files directory #}
 <link rel=stylesheet href="{{ url_for('static', filename='style.css') }}">
 <nav>
 	<h1>Flaskr</h1>
 	<ul>
+        {# If user is logged in, display username and log out button
+            if not, display register and log in button #}
 		{% if g.user %}
 		<li><span>{{ g.user['username'] }}</span>
 		<li><a href="{{ url_for('auth.logout') }}">Log Out</a>
@@ -14,11 +24,14 @@
 	</ul>
 </nav>
 <section class="content">
+    {# Header block for individual view #}
 	<header>
 		{% block header %}{% endblock %}
 	</header>
+    {# Display all messages in flash object #}
 	{% for message in get_flashed_messages() %}
 		<div class="flash">{{ message }}</div>
 	{% endfor %}
+    {# Content block for individual view #}
 	{% block content %}{% endblock %}
 </section>

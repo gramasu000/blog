@@ -5,3 +5,5 @@ instance
 *.pyc
 build
 flaskr.egg-info
+htmlcov
+.coverage

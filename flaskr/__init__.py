@@ -40,7 +40,7 @@ def create_app(test_config=None):
     #   we load a simple hello world page
     @app.route('/hello')
     def hello():
-        return "<h1>Hello World!</h1>"
+        return "Hello World!"
 
     # Register init_db_command and close_db from db.py file
     from . import db

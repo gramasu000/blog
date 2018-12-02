@@ -2,6 +2,10 @@ import pytest
 from flaskr.db import get_db
 
 def test_index(client, auth):
+    """
+    Checks that LogIn and Register buttons are in HTML when user is not logged in
+    Checks that LogOut and Blog by test are in HTML when user is logged in
+    """
     response = client.get("/")
     assert b"Log In" in response.data
     assert b"Register" in response.data
@@ -14,17 +18,23 @@ def test_index(client, auth):
     assert b"test\nbody" in response.data
     assert b"href=\"/1/update\"" in response.data
 
-
 @pytest.mark.parametrize("path", (
     "/create",
     "/1/update",
     "/1/delete"
 ))
 def test_login_required(client, path):
+    """
+    Check that login_required works for /create, /update and /delete endpoints 
+    """
     response = client.post(path)
     assert response.headers["Location"] == "http://localhost/auth/login"
 
 def test_author_required(app, client, auth):
+    """
+    Check that error checking of author works for /create, /update and /delete endpoints
+        and that the update link for the post is removed if the author has changed 
+    """
     with app.app_context():
         db = get_db()
         db.execute("UPDATE post SET author_id = 2 WHERE id = 1")
@@ -40,10 +50,16 @@ def test_author_required(app, client, auth):
     "/2/delete"
 ))
 def test_exists_required(client, auth, path):
+    """
+    Check that we cannot update or delete a post from a another author
+    """
     auth.login()
     assert client.post(path).status_code == 404
 
 def test_create(client, auth, app):
+    """
+    Check that /create endpoint creates a post in database
+    """
     auth.login()
     assert client.get("/create").status_code == 200
     client.post("/create", data={"title": "created", "body": "" })
@@ -54,6 +70,9 @@ def test_create(client, auth, app):
         assert count == 2
 
 def test_update(client, auth, app):
+    """
+    Check that /update endpoint updates a post in database
+    """
     auth.login()
     assert client.get("/1/update").status_code == 200
     client.post("/1/update", data={"title":"updated", "body": ""})
@@ -68,11 +87,18 @@ def test_update(client, auth, app):
     "/1/update"
 ))
 def test_create_update_validate(client, auth, path):
+    """
+    Check that the following error checks work for /create, /update
+        - Title Required
+    """
     auth.login()
     response = client.post(path, data={"title": "", "body": ""})
     assert b"Title is required" in response.data
 
 def test_delete(client, auth, app):
+    """
+    Check that delete actually deletes a post from database
+    """
     auth.login()
     response = client.post("/1/delete")
     assert response.headers["Location"] == "http://localhost/"

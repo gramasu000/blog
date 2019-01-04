@@ -26,9 +26,14 @@ def create_app(test_config=None):
     # Loads normal configuration file in instance/ folder,
     #   or test configuration file if required.  
     if test_config is None:
-        app.config.from_pyfile("config.py", silent=True)
+        try:
+            app.config.from_pyfile("config.py")
+            print(" * File Configuration")
+        except FileNotFoundError:
+            print(" * Default Configuration")
     else:
         app.config.from_mapping(test_config)
+        print(" * Test Configuration")
 
     # Ensure that the instance folder exists
     try:

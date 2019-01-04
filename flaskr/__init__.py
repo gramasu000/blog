@@ -1,5 +1,7 @@
 import os
+import click
 from flask import Flask
+from flask.cli import with_appcontext 
 
 def create_app(test_config=None):
     """
@@ -23,6 +25,12 @@ def create_app(test_config=None):
         DATABASE=os.path.join(app.instance_path, "flaskr.sqlite"),
     )
     
+    # Ensure that the instance folder exists
+    try:
+        os.makedirs(app.instance_path)
+    except OSError:
+        pass
+    
     # Loads normal configuration file in instance/ folder,
     #   or test configuration file if required.  
     if test_config is None:
@@ -35,11 +43,16 @@ def create_app(test_config=None):
         app.config.from_mapping(test_config)
         print(" * Test Configuration")
 
-    # Ensure that the instance folder exists
-    try:
-        os.makedirs(app.instance_path)
-    except OSError:
-        pass
+    # Initializes config.py by command line
+    @click.command("init-key-config")
+    @with_appcontext
+    def init_key_config_command():
+        config_path = os.path.join(app.instance_path, "config.py")
+        with open(config_path, "w") as config_file:
+            string = "DEBUG = False\nSECRET_KEY = {}".format(os.urandom(16))
+            config_file.write(string)
+
+    app.cli.add_command(init_key_config_command)
 
     # When the web url is <url>/hello, 
     #   we load a simple hello world page
